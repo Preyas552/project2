@@ -1,7 +1,8 @@
+"use client";
 import React from 'react';
 import UploadForm from '../components/Upload/UploadForm';
 
-export default function HomePage() {
+async function HomePage() {
   return (
     <>
       <div className="fixed top-2 right-4 z-50">
@@ -19,3 +20,5 @@ export default function HomePage() {
     </>
   );
 }
+
+export default HomePage;

@@ -1,24 +1,18 @@
-// app/gallery/page.tsx
 import { Suspense } from 'react';
 import GalleryGrid from '@/components/Gallery/GalleryGrid';
 import { listImages } from '@/server-actions/list-images';
 
 export const dynamic = 'force-dynamic';
 
-interface SearchParams {
-  token?: string;
-  limit?: string;
-}
-
-interface PageProps {
-  searchParams: Promise<SearchParams>;
-  params: Record<string, string | string[]>;
-}
-
-export default async function GalleryPage({ searchParams, params }: PageProps) {
-  // Await searchParams before destructuring
-  const resolvedParams = await searchParams;
-  const { token, limit: limitStr } = resolvedParams;
+export default async function GalleryPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  // Await the searchParams Promise to get the actual query parameters
+  const resolvedSearchParams = await searchParams;
+  const token = resolvedSearchParams.token as string | undefined;
+  const limitStr = resolvedSearchParams.limit as string | undefined;
   const limit = limitStr ? parseInt(limitStr, 10) : 20;
 
   const { items, nextContinuationToken, isTruncated } = await listImages(

@@ -1,15 +1,26 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import { ImageItem } from '@/server-actions/list-images';
 import { deleteImages } from '@/server-actions/delete-images';
 import BulkActions from './BulkActions';
+import { formatFileSize } from '@/lib/utils/file-validation';
 
 export default function GalleryGrid({ images }: { images: ImageItem[] }) {
   const [selectedImages, setSelectedImages] = useState<Set<string>>(new Set());
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteMessage, setDeleteMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [debugLogs, setDebugLogs] = useState<string[]>([]);
+
+  const fetchDebugLogs = async () => {
+    try {
+      const response = await fetch('/api/logs');
+      const data = await response.json();
+      setDebugLogs(data.logs || []);
+    } catch (error) {
+      console.error('Error fetching logs:', error);
+    }
+  };
 
   const toggleSelection = (key: string) => {
     const newSelection = new Set(selectedImages);
@@ -23,10 +34,8 @@ export default function GalleryGrid({ images }: { images: ImageItem[] }) {
 
   const selectAll = () => {
     if (selectedImages.size === images.length) {
-      // Deselect all if all are selected
       setSelectedImages(new Set());
     } else {
-      // Select all
       setSelectedImages(new Set(images.map(img => img.key)));
     }
   };
@@ -42,15 +51,21 @@ export default function GalleryGrid({ images }: { images: ImageItem[] }) {
     try {
       const result = await deleteImages(Array.from(selectedImages));
       
+      // Fetch logs after delete operation
+      await fetchDebugLogs();
+      
       if (result.success) {
         setDeleteMessage({ type: 'success', text: `Successfully deleted ${result.deleted} image(s)` });
         setSelectedImages(new Set());
-        // Force refresh the page to show the updated gallery
         window.location.reload();
       } else {
-        setDeleteMessage({ type: 'error', text: result.message || 'Failed to delete images' });
+        setDeleteMessage({ 
+          type: 'error', 
+          text: `Failed to delete images: ${result.message}` 
+        });
       }
     } catch (error) {
+      await fetchDebugLogs();
       setDeleteMessage({ 
         type: 'error', 
         text: error instanceof Error ? error.message : 'An unknown error occurred' 
@@ -69,6 +84,16 @@ export default function GalleryGrid({ images }: { images: ImageItem[] }) {
       {deleteMessage && (
         <div className={`mb-4 p-3 rounded ${deleteMessage.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
           {deleteMessage.text}
+          {deleteMessage.type === 'error' && debugLogs.length > 0 && (
+            <div className="mt-2">
+              <details>
+                <summary className="cursor-pointer font-semibold">Show Debug Logs</summary>
+                <pre className="mt-2 p-2 bg-gray-900 text-gray-100 rounded text-xs overflow-x-auto">
+                  {debugLogs.join('\n')}
+                </pre>
+              </details>
+            </div>
+          )}
           <button 
             className="ml-2 font-bold"
             onClick={() => setDeleteMessage(null)}
@@ -107,7 +132,7 @@ export default function GalleryGrid({ images }: { images: ImageItem[] }) {
               <p className="truncate text-sm">{image.key.split('/').pop()}</p>
               <p className="text-xs text-gray-500">
                 {new Date(image.lastModified).toLocaleDateString()} • 
-                {(image.size / 1024).toFixed(1)} KB
+                {formatFileSize(image.size)}
               </p>
             </div>
             
