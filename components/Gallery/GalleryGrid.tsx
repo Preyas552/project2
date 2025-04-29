@@ -5,6 +5,7 @@ import { ImageItem } from '@/server-actions/list-images';
 import { deleteImages } from '@/server-actions/delete-images';
 import BulkActions from './BulkActions';
 import { formatFileSize } from '@/lib/utils/file-validation';
+import UploadForm from '../Upload/UploadForm';
 
 interface ModalProps {
   image: ImageItem;
@@ -158,7 +159,11 @@ export default function GalleryGrid({ images }: { images: ImageItem[] }) {
           </button>
         </div>
       )}
-      
+
+      <div className="mb-4">
+        <UploadForm />
+      </div>
+
       <BulkActions 
         selectedCount={selectedImages.size}
         totalCount={images.length}
@@ -166,7 +171,7 @@ export default function GalleryGrid({ images }: { images: ImageItem[] }) {
         onDelete={handleDelete}
         isDeleting={isDeleting}
       />
-      
+
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
         {images.map((image) => (
           <div 
