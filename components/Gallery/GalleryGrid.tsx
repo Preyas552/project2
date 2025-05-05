@@ -165,6 +165,7 @@ export default function GalleryGrid({ images }: { images: ImageItem[] }) {
         onSelectAll={selectAll}
         onDelete={handleDelete}
         isDeleting={isDeleting}
+        selectedImages={selectedImages}
       />
       
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">

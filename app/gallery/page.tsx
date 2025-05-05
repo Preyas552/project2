@@ -1,28 +1,20 @@
 import { Suspense } from 'react';
 import GalleryGrid from '@/components/Gallery/GalleryGrid';
 import { listImages } from '@/server-actions/list-images';
+import UploadForm from '@/components/Upload/UploadForm';
 
 export const dynamic = 'force-dynamic';
 
-export default async function GalleryPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}) {
-  // Await the searchParams Promise to get the actual query parameters
-  const resolvedSearchParams = await searchParams;
-  const token = resolvedSearchParams.token as string | undefined;
-  const limitStr = resolvedSearchParams.limit as string | undefined;
-  const limit = limitStr ? parseInt(limitStr, 10) : 20;
-
-  const { items, nextContinuationToken, isTruncated } = await listImages(
-    'uploads/',
-    token,
-    limit,
-  );
+export default async function GalleryPage() {
+  const { items } = await listImages();
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-semibold text-gray-800 dark:text-gray-200">Photo Gallery</h1>
+        <UploadForm />
+      </div>
+
       <div className="bg-white rounded-lg shadow-sm p-6">
         <Suspense
           fallback={
@@ -36,26 +28,6 @@ export default async function GalleryPage({
         >
           <GalleryGrid images={items} />
         </Suspense>
-
-        {isTruncated && (
-          <div className="mt-8 text-center">
-            <a
-              href={`/gallery?token=${encodeURIComponent(nextContinuationToken ?? '')}`}
-              className="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
-            >
-              <span>Load More</span>
-              <svg className="w-4 h-4 ml-2" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M19 9l-7 7-7-7"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </a>
-          </div>
-        )}
       </div>
     </div>
   );

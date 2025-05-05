@@ -3,16 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.796.0",
-    "@aws-sdk/s3-request-presigner": "^3.796.0",
-    "aws-sdk": "^2.1692.0",
+    "@aws-sdk/client-s3": "^3.802.0",
+    "@aws-sdk/s3-request-presigner": "^3.802.0",
     "indicator": "^0.1.2",
+    "jszip": "^3.10.1",
     "next": "15.3.1",
     "progress": "^2.0.3",
     "react": "^19.1.0",
@@ -22,11 +22,13 @@
     "uuid": "^11.1.0"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
+    "@aws-sdk/types": "^3.775.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "tailwindcss": "^4",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^3.3.0",
     "typescript": "^5"
   }
 }

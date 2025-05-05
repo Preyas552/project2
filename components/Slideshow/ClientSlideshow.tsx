@@ -8,6 +8,11 @@ import { ImageItem } from '@/server-actions/list-images';
 export default function ClientSlideshow({ images }: { images: ImageItem[] }) {
   const [isPlaying, setIsPlaying] = useState(true);
   
+  console.log('ClientSlideshow received images:', images);
+
+  // Map ImageItems to their URLs
+  const imageUrls = images.map(img => img.url);
+
   const handlePlayPause = () => {
     setIsPlaying(!isPlaying);
   };
@@ -24,16 +29,18 @@ export default function ClientSlideshow({ images }: { images: ImageItem[] }) {
   };
   
   return (
-    <div className="slideshow-container">
+    <div className="slideshow-container min-h-screen">
       <ControlBar 
         isPlaying={isPlaying}
         onPlayPause={handlePlayPause}
         onFullscreen={handleFullscreen}
       />
-      <SlideshowView 
-        images={images.map(img => img.url)} 
-        autoplay={isPlaying}
-      />
+      <div className="w-full h-full flex items-center justify-center">
+        <SlideshowView 
+          images={imageUrls} 
+          autoplay={isPlaying}
+        />
+      </div>
     </div>
   );
 }

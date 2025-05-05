@@ -1,5 +1,5 @@
-import { DeleteObjectsCommand } from '@aws-sdk/client-s3';
-import { addLog } from '../app/api/logs/route';
+import { DeleteObjectsCommand, DeleteObjectsCommandInput, S3Client } from '@aws-sdk/client-s3';
+import { addLog } from '@/lib/utils/logs/logger';
 import { getS3Client } from '../lib/aws/s3-client';
 
 export async function deleteImages(keys: string[]) {

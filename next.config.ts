@@ -4,19 +4,15 @@ const nextConfig: NextConfig = {
   output: 'standalone',
   images: {
     domains: [
-      'preyas-photo-app-bucket.s3.us-east-1.amazonaws.com',
+      process.env.S3_BUCKET_DOMAIN || '',
     ],
   },
+  // Only expose necessary env variables to the client
   env: {
-    AWS_REGION: process.env.AWS_REGION,
-    AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
-    AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
-    S3_BUCKET_NAME: process.env.S3_BUCKET_NAME,
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
   },
+  // Keep sensitive variables server-side only
   serverRuntimeConfig: {
-    // Will only be available on the server side
-    AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
-    AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
     AWS_REGION: process.env.AWS_REGION,
     S3_BUCKET_NAME: process.env.S3_BUCKET_NAME,
   },

@@ -4,12 +4,14 @@ export default function BulkActions({
   onSelectAll,
   onDelete,
   isDeleting,
+  selectedImages,
 }: {
   selectedCount: number;
   totalCount: number;
   onSelectAll: () => void;
   onDelete: () => void;
   isDeleting: boolean;
+  selectedImages: Set<string>;
 }) {
   return (
     <div className="flex justify-between items-center bg-gray-800 p-3 rounded-lg mb-4">
@@ -28,13 +30,21 @@ export default function BulkActions({
       </div>
       
       {selectedCount > 0 && (
-        <button
-          onClick={onDelete}
-          disabled={isDeleting}
-          className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 disabled:bg-red-300 disabled:cursor-not-allowed"
-        >
-          {isDeleting ? 'Deleting...' : `Delete (${selectedCount})`}
-        </button>
+        <div className="flex space-x-2">
+          <button
+            onClick={onDelete}
+            disabled={isDeleting}
+            className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 disabled:bg-red-300 disabled:cursor-not-allowed"
+          >
+            {isDeleting ? 'Deleting...' : `Delete (${selectedCount})`}
+          </button>
+          <a
+            href={`/api/download?keys=${encodeURIComponent(JSON.stringify(Array.from(selectedImages)))}`}
+            className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Download ({selectedCount})
+          </a>
+        </div>
       )}
     </div>
   );

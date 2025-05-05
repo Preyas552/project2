@@ -1,12 +1,21 @@
 import { v4 as uuidv4 } from 'uuid';
+import { validateFile } from '../utils/file-validation';
+import { addLog } from '../utils/logs/logger';
 
 export async function uploadImage(
   file: File,
   progressCallback?: (progress: number) => void
 ): Promise<string> {
   try {
-    // Generate a unique file name
-    const fileKey = `uploads/${uuidv4()}-${file.name.replace(/\s+/g, '-')}`;
+    // Validate file before proceeding
+    const validationResult = await validateFile(file);
+    if (!validationResult.valid) {
+      throw new Error(validationResult.message || 'Invalid file');
+    }
+
+    // Use sanitized filename and add UUID to ensure uniqueness
+    const sanitizedName = validationResult.sanitizedName || file.name;
+    const fileKey = `uploads/${uuidv4()}-${sanitizedName}`;
     
     // Get presigned URL from our API
     const response = await fetch('/api/upload', {
@@ -21,12 +30,13 @@ export async function uploadImage(
     });
 
     if (!response.ok) {
-      throw new Error('Failed to get upload URL');
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to get upload URL');
     }
 
     const { presignedUrl } = await response.json();
 
-    // Upload the file using the presigned URL
+    // Upload the file using the presigned URL with progress tracking
     const xhr = new XMLHttpRequest();
     xhr.open('PUT', presignedUrl);
     xhr.setRequestHeader('Content-Type', file.type);
@@ -43,18 +53,26 @@ export async function uploadImage(
     await new Promise<void>((resolve, reject) => {
       xhr.onload = () => {
         if (xhr.status === 200) {
+          addLog(`Successfully uploaded ${fileKey}`);
           resolve();
         } else {
-          reject(new Error(`Upload failed with status: ${xhr.status}`));
+          const error = `Upload failed with status: ${xhr.status}`;
+          addLog(error, 'error');
+          reject(new Error(error));
         }
       };
-      xhr.onerror = () => reject(new Error('Upload failed'));
+      xhr.onerror = () => {
+        const error = 'Network error during upload';
+        addLog(error, 'error');
+        reject(new Error(error));
+      };
       xhr.send(file);
     });
     
     return fileKey;
   } catch (error) {
-    console.error('Error uploading file:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error during upload';
+    addLog(errorMessage, 'error');
     throw error;
   }
 }
