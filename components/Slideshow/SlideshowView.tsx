@@ -16,7 +16,7 @@ const SlideshowView: React.FC<SlideshowViewProps> = ({ images, autoplay = true }
   return (
     <Swiper
       modules={[Autoplay, Navigation, Pagination]}
-      spaceBetween={10}
+      spaceBetween={0}
       slidesPerView={1}
       autoplay={autoplay ? { delay: 3000, disableOnInteraction: false } : false}
       pagination={{ clickable: true }}
@@ -25,11 +25,11 @@ const SlideshowView: React.FC<SlideshowViewProps> = ({ images, autoplay = true }
     >
       {images.map((image, index) => (
         <SwiperSlide key={index}>
-          <div className="relative aspect-video w-full">
+          <div className="w-full h-full flex items-center justify-center bg-black">
             <img 
               src={image} 
               alt={`Slide ${index + 1}`} 
-              className="object-contain w-full h-full"
+              className="max-w-full max-h-full object-contain"
             />
           </div>
         </SwiperSlide>

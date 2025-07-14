@@ -131,7 +131,7 @@ export default function GalleryGrid({ images }: { images: ImageItem[] }) {
   };
 
   if (images.length === 0) {
-    return <div className="text-center py-12">No images found. Upload some photos to get started!</div>;
+    return <div className="text-center py-12 text-black">No images found. Upload some photos to get started!</div>;
   }
 
   return (

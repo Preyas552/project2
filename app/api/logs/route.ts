@@ -1,21 +1,11 @@
 import { NextResponse } from 'next/server';
-
-let logs: string[] = [];
-
-export function addLog(message: string) {
-  const timestamp = new Date().toISOString();
-  logs.push(`${timestamp}: ${message}`);
-  if (logs.length > 100) {
-    logs = logs.slice(-100);
-  }
-  console.log(`${timestamp}: ${message}`); // Also log to server console
-}
+import { getLogs, clearLogs } from '../../../lib/utils/logger';
 
 export async function GET() {
-  return NextResponse.json({ logs });
+  return NextResponse.json({ logs: getLogs() });
 }
 
 export async function DELETE() {
-  logs = [];
+  clearLogs();
   return NextResponse.json({ message: 'Logs cleared' });
 }
